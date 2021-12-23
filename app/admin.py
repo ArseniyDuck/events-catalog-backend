@@ -24,6 +24,6 @@ admin.site.register(PopularCategory, PopularCategoryAdmin)
 class EventAdmin(admin.ModelAdmin):
    fields = (
       'name', 'description', 'time', ('people_required', 'people_joined'),
-      'place', 'price', 'categories', 'creator',
+      'place', 'photo', 'price', 'categories', 'creator',
    )
 admin.site.register(Event, EventAdmin)

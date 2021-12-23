@@ -24,7 +24,7 @@ class EventSerializer(serializers.ModelSerializer):
    
    class Meta:
       model = Event
-      fields = '__all__'
+      exclude = ('is_active', )
 
 
 class UserSerializer(serializers.ModelSerializer):

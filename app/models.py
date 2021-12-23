@@ -26,13 +26,13 @@ class Event(models.Model):
    is_active = models.BooleanField(default=True)
    name = models.CharField(max_length=360)
    description = models.TextField()
+   photo = models.ImageField(upload_to='events/', blank=True)
    time = models.DateTimeField()
    people_required = models.PositiveSmallIntegerField()
    people_joined = models.PositiveSmallIntegerField()
    place = models.CharField(max_length=360)
-   price = models.PositiveSmallIntegerField(blank=True)
+   price = models.PositiveSmallIntegerField(blank=True, null=True)
    categories = models.ManyToManyField(Category)
-   photo = models.ImageField(upload_to='events/', blank=True)
    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_events')
 
    def __str__(self):
@@ -41,6 +41,9 @@ class Event(models.Model):
 
 class PopularCategory(models.Model):
    categories = models.ManyToManyField(Category)
+
+   class Meta:
+      verbose_name_plural = 'popular categories'
 
    def __str__(self):
       return ", ".join([str(i) for i in self.categories.all()])
