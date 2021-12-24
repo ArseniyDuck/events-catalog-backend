@@ -1,13 +1,25 @@
+from django.db.models import fields
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.password_validation import validate_password
-from .models import Category, Event
+from .models import Category, Event, PopularCategory
 
 
 class CategorySerializer(serializers.ModelSerializer):
    class Meta:
       model = Category
-      fields = '__all__'
+      fields = ('id', 'name', 'color', )
+
+   
+class PopularCategoriesSeializer(CategorySerializer):
+   is_popular = serializers.SerializerMethodField()
+
+   def get_is_popular(self, obj):
+      popular_categories = PopularCategory.objects.first().categories
+      return popular_categories.filter(pk=obj.pk).exists()
+
+   class Meta(CategorySerializer.Meta):
+      fields  = CategorySerializer.Meta.fields + ('is_popular', )
 
 
 class CreatorSerializer(serializers.ModelSerializer):

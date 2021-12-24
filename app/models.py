@@ -31,9 +31,12 @@ class Event(models.Model):
    people_required = models.PositiveSmallIntegerField()
    people_joined = models.PositiveSmallIntegerField()
    place = models.CharField(max_length=360)
-   price = models.PositiveSmallIntegerField(blank=True, null=True)
+   price = models.PositiveSmallIntegerField(blank=True, default=0)
    categories = models.ManyToManyField(Category)
    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_events')
+
+   def available_places(self):
+      return self.people_required - self.people_joined
 
    def __str__(self):
       return self.name
