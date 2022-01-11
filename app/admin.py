@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from .models import Category, Event, PopularCategory
+from .models import Category, Event, PopularCategory, User
 from .forms import CategoryForm
 
 
@@ -24,6 +24,11 @@ admin.site.register(PopularCategory, PopularCategoryAdmin)
 class EventAdmin(admin.ModelAdmin):
    fields = (
       'name', 'description', 'time', ('people_required', 'people_joined'),
-      'place', 'photo', 'price', 'categories', 'creator',
+      'place', 'photo', 'price', 'categories', 'creator', 'is_active',
    )
+   list_display = ('name', 'is_active', )
+   list_display_links = ('name', )
 admin.site.register(Event, EventAdmin)
+
+# todo: User in admin only while debugging
+admin.site.register(User)

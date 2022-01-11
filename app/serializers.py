@@ -1,8 +1,9 @@
 from django.db.models import fields
-from rest_framework import serializers
+from rest_framework import serializers, validators
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.password_validation import validate_password
 from .models import Category, Event, PopularCategory
+from .validators import phone_validator
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -33,16 +34,45 @@ class CreatorSerializer(serializers.ModelSerializer):
 class EventSerializer(serializers.ModelSerializer):
    categories = CategorySerializer(many=True)
    creator = CreatorSerializer()
+
+   def create(self, validated_data):
+      return Event.objects.create(
+         is_active=True,
+         name=validated_data.get('name'),
+         description=validated_data.get('description'),
+         # photo=null
+         time=validated_data.get('time'),
+         people_required=validated_data.get('people_required'),
+         people_joined=0,
+         place=validated_data.get('place'),
+         price=validated_data.get('price'),
+         # categories=
+         creator=self.context['request'].user
+      )
    
    class Meta:
       model = Event
       exclude = ('is_active', )
 
 
+class UserEventSerializer(serializers.ModelSerializer):
+   categories = CategorySerializer(many=True)
+   creator = CreatorSerializer()
+
+   class Meta:
+      model = Event
+      fields = '__all__'
+
+
 class UserSerializer(serializers.ModelSerializer):
+   fullname = serializers.CharField(source='get_full_name')
+
    class Meta:
       model = get_user_model()
-      fields = ('id', 'username', )
+      fields = (
+         'id', 'username', 'phone_number',
+         'photo', 'fullname', 'is_profile_notification_shown',
+      )
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -68,3 +98,9 @@ class RegisterSerializer(serializers.ModelSerializer):
       user.save()
       login(self.context['request'], user)
       return user
+
+
+class UpdateProfileSerializer(serializers.Serializer):
+   first_name = serializers.CharField(max_length=150)
+   last_name = serializers.CharField(max_length=150)
+   phone_number = serializers.CharField(validators=[phone_validator], max_length=12)

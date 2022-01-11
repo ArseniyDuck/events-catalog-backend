@@ -1,19 +1,18 @@
 from django import forms
 from django.db import models
-from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser
+from .validators import phone_validator, color_validator
 
 
 class User(AbstractUser):
-   phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message='Phone number must be entered in the format: \'+999999999\'. Up to 15 digits allowed.')
-   phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True)
-   photo = models.ImageField(upload_to='users/', blank=True)
+   phone_number = models.CharField(validators=[phone_validator], max_length=12, blank=True)
+   photo = models.ImageField(upload_to='users/', null=True)
+   is_profile_notification_shown = models.BooleanField(default=True)
 
 
 class Category(models.Model):
    name = models.CharField(max_length=180)
-   color_regex = RegexValidator(regex=r'^#(?:[0-9a-fA-F]{3}){1,2}$', message='Color must be in hex')
-   color = models.CharField(max_length=7, validators=[color_regex])
+   color = models.CharField(max_length=7, validators=[color_validator])
 
    class Meta:
       verbose_name_plural = 'categories'
