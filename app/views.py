@@ -62,13 +62,13 @@ class UserEvents(generics.ListAPIView):
    filter_backends = [filters.SearchFilter]
    search_fields = ['name']
    def get_queryset(self):
-      return Event.objects.filter(creator=self.request.user)
+      return Event.objects.filter(creator=self.request.user).order_by('-id')
 
 
 class EventCreationView(generics.CreateAPIView):
    permission_classes = [IsAuthenticated]
    authentication_classes = [JWTAuthentication]
-   serializer_class = EventSerializer
+   serializer_class = UserEventSerializer
 
 
 class CategoriesView(generics.ListAPIView):

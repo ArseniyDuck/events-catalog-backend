@@ -34,21 +34,6 @@ class CreatorSerializer(serializers.ModelSerializer):
 class EventSerializer(serializers.ModelSerializer):
    categories = CategorySerializer(many=True)
    creator = CreatorSerializer()
-
-   def create(self, validated_data):
-      return Event.objects.create(
-         is_active=True,
-         name=validated_data.get('name'),
-         description=validated_data.get('description'),
-         # photo=null
-         time=validated_data.get('time'),
-         people_required=validated_data.get('people_required'),
-         people_joined=0,
-         place=validated_data.get('place'),
-         price=validated_data.get('price'),
-         # categories=
-         creator=self.context['request'].user
-      )
    
    class Meta:
       model = Event
@@ -56,12 +41,37 @@ class EventSerializer(serializers.ModelSerializer):
 
 
 class UserEventSerializer(serializers.ModelSerializer):
-   categories = CategorySerializer(many=True)
-   creator = CreatorSerializer()
+   categories = serializers.PrimaryKeyRelatedField(
+      many=True,
+      queryset=Category.objects.all()
+   )
+
+   def create(self, validated_data):
+      created_event = Event.objects.create(
+         is_active=True,
+         name=validated_data['name'],
+         description=validated_data['description'],
+         time=validated_data['time'],
+         people_required=validated_data['people_required'],
+         people_joined=0,
+         place=validated_data['place'],
+         price=validated_data['price'],
+         creator=self.context['request'].user,
+      )
+
+      created_event.categories.set(
+         validated_data['categories']
+      )
+
+      return created_event
 
    class Meta:
       model = Event
-      fields = '__all__'
+      fields = (
+         'id', 'is_active', 'name',
+         'description', 'time', 'people_required',
+         'place', 'price', 'categories', 
+      )
 
 
 class UserSerializer(serializers.ModelSerializer):
